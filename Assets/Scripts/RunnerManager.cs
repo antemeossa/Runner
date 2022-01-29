@@ -4,37 +4,24 @@ using UnityEngine;
 
 public class RunnerManager : MonoBehaviour
 {
+    public static RunnerManager instance;
 
-    public static bool gameOver;
+    public int score = 0;
 
-    public static bool isGameStarted;
+    public bool isDead;
 
-    public static int score;
+    public bool gameStarted;
 
-
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
-        score = 0;
-        Time.timeScale = 1;
-
-        gameOver = isGameStarted = false;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (gameOver)
+        if (instance != null)
         {
-            Time.timeScale = 0;
             Destroy(gameObject);
         }
-
-        //start game
-
-        if (!isGameStarted)
+        else
         {
-            isGameStarted = true;
+            instance = this;
+            DontDestroyOnLoad(gameObject);
         }
     }
 }

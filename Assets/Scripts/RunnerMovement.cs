@@ -15,8 +15,12 @@ public class RunnerMovement : MonoBehaviour
 
     private Rigidbody rb;
 
+    public Collider MainCollider;
+    public Collider[] AllColliders;
+
     private float currentSpeed = 0f;
     private float maxSpeed;
+    
 
     private Vector3 move;
 
@@ -25,13 +29,22 @@ public class RunnerMovement : MonoBehaviour
 
     public Animator animator;
 
+    private GameObject model;
 
 
+
+    private void Awake()
+    {
+        MainCollider = GetComponent<Collider>();
+        AllColliders = GetComponentsInChildren<Collider>(true);
+        model = transform.GetChild(0).gameObject;
+
+    }
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        
+
     }
 
     // Update is called once per frame
@@ -46,8 +59,9 @@ public class RunnerMovement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             desiredLane++;
-            if (desiredLane == 3) { 
-                       desiredLane= 2; 
+            if (desiredLane == 3)
+            {
+                desiredLane = 2;
             }
         }
 
@@ -63,15 +77,16 @@ public class RunnerMovement : MonoBehaviour
 
         Vector3 targetPosition = transform.position.z * transform.forward + transform.position.y * transform.up;
 
-        if(desiredLane == 0)
+        if (desiredLane == 0)
         {
             targetPosition += Vector3.left * laneDistance;
-        }else if(desiredLane == 2)
+        }
+        else if (desiredLane == 2)
         {
             targetPosition += Vector3.right * laneDistance;
         }
 
-        transform.position = Vector3.Lerp(transform.position, targetPosition, sideSpeed*Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, targetPosition, sideSpeed * Time.deltaTime);
 
         //Attack
 
@@ -86,7 +101,7 @@ public class RunnerMovement : MonoBehaviour
     {
         Vector3 forwardMove = transform.forward * desiredForwardSpeed * Time.fixedDeltaTime;
         rb.MovePosition(rb.position + forwardMove);
-        
+
     }
 
     private void shootProjectile()
@@ -98,4 +113,31 @@ public class RunnerMovement : MonoBehaviour
 
         }
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("bonusProjectile"))
+        {
+            projectileCount += other.GetComponent<collectibleScript>().bonusProjectileCount;
+            Debug.Log(other);
+        }
+
+        if (other.CompareTag("obstacle"))
+        {
+            animator.SetBool("isDead", true);
+
+            desiredForwardSpeed = 0;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("bonusProjectile"))
+        {
+            Destroy(other);
+        }
+    }
+
+   
+
 }
