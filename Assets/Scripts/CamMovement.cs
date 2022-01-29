@@ -7,7 +7,6 @@ public class CamMovement : MonoBehaviour
 
     [SerializeField]
     private Transform target;
-    private float camLag = 50f;
     private Vector3 offset;
 
 
@@ -18,9 +17,9 @@ public class CamMovement : MonoBehaviour
     }
 
     // Update is called once per frame
-    void LateUpdate()
+    void Update()
     {
         Vector3 newPos = new Vector3(transform.position.x, transform.position.y, offset.z + target.position.z);
-        transform.position = Vector3.Lerp(transform.position, newPos, camLag * Time.deltaTime);
+        transform.position = newPos;
     }
 }

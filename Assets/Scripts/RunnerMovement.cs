@@ -9,6 +9,10 @@ public class RunnerMovement : MonoBehaviour
     private float desiredForwardSpeed = 10f;
     private float sideSpeed = 50f;
 
+    public GameObject projectile;
+    public Transform projectileSpawner;
+    public int projectileCount = 10;
+
     private Rigidbody rb;
 
     private float currentSpeed = 0f;
@@ -27,11 +31,18 @@ public class RunnerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        
     }
 
     // Update is called once per frame
     void Update()
     {
+        animator.SetFloat("Speed", desiredForwardSpeed);
+
+
+        //Changing Lanes
+
+
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             desiredLane++;
@@ -49,6 +60,7 @@ public class RunnerMovement : MonoBehaviour
             }
         }
 
+
         Vector3 targetPosition = transform.position.z * transform.forward + transform.position.y * transform.up;
 
         if(desiredLane == 0)
@@ -60,6 +72,14 @@ public class RunnerMovement : MonoBehaviour
         }
 
         transform.position = Vector3.Lerp(transform.position, targetPosition, sideSpeed*Time.deltaTime);
+
+        //Attack
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            animator.SetTrigger("AttackTrig");
+            shootProjectile();
+        }
     }
 
     private void FixedUpdate()
@@ -69,8 +89,13 @@ public class RunnerMovement : MonoBehaviour
         
     }
 
-    private void run()
+    private void shootProjectile()
     {
+        if (projectileCount > 0)
+        {
+            projectileCount--;
+            Instantiate(projectile, projectileSpawner);
 
+        }
     }
 }
