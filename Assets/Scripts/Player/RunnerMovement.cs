@@ -6,8 +6,8 @@ public class RunnerMovement : MonoBehaviour
 {
 
     [SerializeField]
-    private float desiredForwardSpeed = 10f;
-    private float sideSpeed = 50f;
+    private float desiredForwardSpeed;
+   // private float sideSpeed = 50f;
 
     public GameObject projectile;
     public Transform projectileSpawner;
@@ -15,29 +15,20 @@ public class RunnerMovement : MonoBehaviour
 
     private Rigidbody rb;
 
-    public Collider MainCollider;
-    public Collider[] AllColliders;
 
-    private float currentSpeed = 0f;
-    private float maxSpeed;
     
-
-    private Vector3 move;
 
     private int desiredLane = 1; //0:left, 1: middle, 2: right
     public float laneDistance = 2.5f; //distance between two lanes
 
     public Animator animator;
 
-    private GameObject model;
 
 
 
     private void Awake()
     {
-        MainCollider = GetComponent<Collider>();
-        AllColliders = GetComponentsInChildren<Collider>(true);
-        model = transform.GetChild(0).gameObject;
+       
 
     }
     // Start is called before the first frame update
@@ -50,7 +41,11 @@ public class RunnerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        animator.SetFloat("Speed", desiredForwardSpeed);
+        if (RunnerManager.instance.gameStarted)
+        {
+            animator.SetTrigger("Move");
+        }
+        
 
 
         //Changing Lanes
@@ -75,7 +70,7 @@ public class RunnerMovement : MonoBehaviour
         }
 
 
-        Vector3 targetPosition = transform.position.z * transform.forward + transform.position.y * transform.up;
+        Vector3 targetPosition =  transform.position.z * transform.forward + transform.position.y * transform.up;
 
         if (desiredLane == 0)
         {
@@ -86,7 +81,8 @@ public class RunnerMovement : MonoBehaviour
             targetPosition += Vector3.right * laneDistance;
         }
 
-        transform.position = Vector3.Lerp(transform.position, targetPosition, sideSpeed * Time.deltaTime);
+        
+        transform.position = targetPosition;
 
         //Attack
 
@@ -95,6 +91,10 @@ public class RunnerMovement : MonoBehaviour
             animator.SetTrigger("AttackTrig");
             shootProjectile();
         }
+
+        UIManager.instance.projectileInt = projectileCount;
+
+        
     }
 
     private void FixedUpdate()
@@ -106,7 +106,7 @@ public class RunnerMovement : MonoBehaviour
 
     private void shootProjectile()
     {
-        if (projectileCount > 0)
+        if (projectileCount > 0 && !RunnerManager.instance.isDead && RunnerManager.instance.gameStarted)
         {
             projectileCount--;
             Instantiate(projectile, projectileSpawner);
@@ -119,7 +119,6 @@ public class RunnerMovement : MonoBehaviour
         if (other.CompareTag("bonusProjectile"))
         {
             projectileCount += other.GetComponent<collectibleScript>().bonusProjectileCount;
-            Debug.Log(other);
         }
 
         if (other.CompareTag("obstacle"))
@@ -127,6 +126,9 @@ public class RunnerMovement : MonoBehaviour
             animator.SetBool("isDead", true);
 
             desiredForwardSpeed = 0;
+
+            RunnerManager.instance.isDead = true;
+
         }
     }
 

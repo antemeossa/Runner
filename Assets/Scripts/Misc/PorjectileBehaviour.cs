@@ -21,8 +21,11 @@ public class PorjectileBehaviour : MonoBehaviour
         transform.position  += new Vector3(0,0, projectileSpeed * Time.deltaTime);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        Destroy(gameObject);
+        if (other.CompareTag("obstacle"))
+        {
+            Destroy(gameObject);
+        }
     }
 }

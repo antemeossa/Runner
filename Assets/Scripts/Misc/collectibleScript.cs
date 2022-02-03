@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObstacleScript : MonoBehaviour
+public class collectibleScript : MonoBehaviour
 {
+
+    public int bonusProjectileCount = 5;
     // Start is called before the first frame update
     void Start()
     {
@@ -16,4 +18,12 @@ public class ObstacleScript : MonoBehaviour
         
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            Destroy(gameObject);
+
+        }
+    }
 }
